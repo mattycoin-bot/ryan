@@ -27,6 +27,19 @@
 </style>
 </head>
 <body>
+  <div id="ticker" style="position:fixed;top:0;left:0;width:100%;background:#111;color:#0f0;font:14px monospace;padding:4px 0;overflow:hidden;white-space:nowrap;z-index:999">
+  <span id="tickerText" style="display:inline-block;padding-left:100%;animation:scroll 25s linear infinite"></span>
+</div>
+<style>@keyframes scroll{to{transform:translateX(-100%)}} body{padding-top:28px}</style>
+<script>
+  const now = new Date(), start = new Date(now);
+  start.setDate(now.getDate() - now.getDay());
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  const f = d => d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  const coins = ['RYANCOIN ▲ 420%', 'MOONDOGE ▼ 98%', 'RUGPULL ▲ 1337%', 'HODLR ▼ 69%'];
+  document.getElementById('tickerText').textContent =
+    `📈 BREAKING: Pick of the Week for ${f(start)} – ${f(end)}, ${end.getFullYear()}  •  ` + coins.join('  •  ');
+</script>
 <div id="tap" class="screen">
   <h1>🚀 Ryan's Shitcoin Pick of the Week 🚀</h1>
   <div class="ticker">RYANCOIN ▲ +42,069% 📈</div>
