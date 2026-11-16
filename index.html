@@ -45,20 +45,24 @@
     c.textContent=e[i%e.length];c.style.left=Math.random()*100+'vw';
     c.style.animationDuration=(3+Math.random()*5)+'s';c.style.animationDelay=(-Math.random()*8)+'s';
     document.body.appendChild(c);}
-  var v=document.getElementById('v'),ready=false,started=false,timers=[],minDone=false;
-  v.addEventListener('canplaythrough',function(){ready=true;go();});
+  var v=document.getElementById('v'),ready=false,started=false,timers=[],minDone=false,shown=false;
+  v.addEventListener('canplay',function(){ready=true;go();});
   function go(){
-    if(!started||!ready||!minDone)return;
+    if(shown||!started||!ready||!minDone)return;
+    shown=true;
     timers.forEach(clearInterval);
     document.getElementById('load').style.display='none';
-    v.style.display='block';v.currentTime=0;v.play();
+    v.style.display='block';v.currentTime=0;v.muted=false;
+    var p=v.play();
+    if(p&&p.catch)p.catch(function(){v.controls=true;});
   }
   function money(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
   document.getElementById('tap').onclick=function(){
     this.style.display='none';
     document.getElementById('load').style.display='flex';
-    v.src='videomp4-001.mp4';v.load();
-    v.play().then(function(){if(!(ready&&minDone))v.pause();go();}).catch(function(){});
+    v.src='videomp4-001.mp4';v.muted=true;
+    var p=v.play();
+    if(p&&p.then)p.then(function(){if(!shown)v.pause();}).catch(function(){});
     var thisYear=new Date().getFullYear();
     var year=thisYear-4,price=0.01,box=document.getElementById('years');
     function addYear(){
