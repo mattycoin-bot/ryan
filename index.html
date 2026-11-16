@@ -38,7 +38,7 @@
   <div id="years"></div>
   <div id="msg">Loading...</div>
 </div>
-<video id="v" src="videomp4-001.mp4" loop playsinline preload="auto"></video>
+<video id="v" loop playsinline preload="none"></video>
 <script>
   var e=['🪙','💰','🚀','🐕','💎','🌕','💸'];
   for(var i=0;i<30;i++){var c=document.createElement('div');c.className='coin';
@@ -57,7 +57,8 @@
   document.getElementById('tap').onclick=function(){
     this.style.display='none';
     document.getElementById('load').style.display='flex';
-    v.play().then(function(){if(!ready)v.pause();go();}).catch(function(){});
+    v.src='videomp4-001.mp4';v.load();
+    v.play().then(function(){if(!(ready&&minDone))v.pause();go();}).catch(function(){});
     var thisYear=new Date().getFullYear();
     var year=thisYear-4,price=0.01,box=document.getElementById('years');
     function addYear(){
