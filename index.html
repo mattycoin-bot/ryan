@@ -8,20 +8,35 @@
   video{position:fixed;inset:0;width:100%;height:100%;background:#000;display:none;z-index:5}
   .coin{position:fixed;top:-60px;font-size:40px;animation:fall linear infinite}
   @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
-  #tap{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-       text-align:center;cursor:pointer;padding:20px;z-index:2}
+  .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+       text-align:center;padding:20px;z-index:2}
+  #tap{cursor:pointer}
+  #load{display:none;background:rgba(0,0,0,.9);z-index:4}
   h1{font-size:34px;margin:0;color:#ffd700;text-shadow:0 0 10px #ffae00,0 0 25px #ff8c00;animation:pulse 1s infinite alternate}
   @keyframes pulse{to{transform:scale(1.08)}}
   .ticker{margin-top:20px;color:#0f0;font:bold 22px monospace}
   .btn{margin-top:25px;padding:15px 30px;border-radius:40px;background:linear-gradient(#ffe066,#d4a000);
        color:#000;font-weight:bold;font-size:22px;box-shadow:0 0 20px #ffd700}
+  .spin{font-size:70px;animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotateY(360deg)}}
+  #title{color:#ffd700;font-size:24px;font-weight:bold;margin-top:10px}
+  #years{margin-top:15px;font:bold 24px monospace;color:#0f0;text-shadow:0 0 8px #0f0;min-height:190px}
+  #years div{animation:pop .4s}
+  @keyframes pop{from{transform:scale(1.6);opacity:0}}
+  #msg{color:#fff;font-size:22px;margin-top:10px}
 </style>
 </head>
 <body>
-<div id="tap">
+<div id="tap" class="screen">
   <h1>🚀 Ryan's Shitcoin Pick of the Week 🚀</h1>
   <div class="ticker">RYANCOIN ▲ +42,069% 📈</div>
   <div class="btn">💰 Click to view 💰</div>
+</div>
+<div id="load" class="screen">
+  <div class="spin">🪙</div>
+  <div id="title">RYANCOIN PRICE HISTORY</div>
+  <div id="years"></div>
+  <div id="msg">Loading...</div>
 </div>
 <video id="v" src="videomp4-001.mp4" loop playsinline preload="auto"></video>
 <script>
@@ -30,8 +45,35 @@
     c.textContent=e[i%e.length];c.style.left=Math.random()*100+'vw';
     c.style.animationDuration=(3+Math.random()*5)+'s';c.style.animationDelay=(-Math.random()*8)+'s';
     document.body.appendChild(c);}
+  var v=document.getElementById('v'),ready=false,started=false,timers=[],minDone=false;
+  v.addEventListener('canplaythrough',function(){ready=true;go();});
+  function go(){
+    if(!started||!ready||!minDone)return;
+    timers.forEach(clearInterval);
+    document.getElementById('load').style.display='none';
+    v.style.display='block';v.currentTime=0;v.play();
+  }
+  function money(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
   document.getElementById('tap').onclick=function(){
-    var v=document.getElementById('v');v.style.display='block';v.play();
+    this.style.display='none';
+    document.getElementById('load').style.display='flex';
+    v.play().then(function(){if(!ready)v.pause();go();}).catch(function(){});
+    var thisYear=new Date().getFullYear();
+    var year=thisYear-4,price=0.01,box=document.getElementById('years');
+    function addYear(){
+      var label=year>thisYear?year+' (projected)':year;
+      var d=document.createElement('div');d.textContent=label+'  '+money(price)+' ▲';
+      box.appendChild(d);
+      while(box.children.length>5)box.removeChild(box.firstChild);
+      year++;price*=(8+Math.random()*12);
+    }
+    addYear();
+    timers.push(setInterval(addYear,1000));
+    var msgs=['Loading...','Waiting...','Waiting...','Optimizing...','Loading...','To the moon... 🚀'],m=0;
+    timers.push(setInterval(function(){m=(m+1)%msgs.length;
+      document.getElementById('msg').textContent=msgs[m];},1100));
+    setTimeout(function(){minDone=true;go();},5000);
+    started=true;go();
   };
 </script>
 </body>
